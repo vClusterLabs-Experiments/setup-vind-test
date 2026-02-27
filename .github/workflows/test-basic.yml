@@ -13,18 +13,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: loft-sh/setup-vind@main
-      - name: Verify cluster is running
+      - name: Wait for node ready
         run: |
-          echo "=== Nodes ==="
-          kubectl get nodes
-          echo "=== Cluster Info ==="
+          echo "Waiting for nodes to register..."
+          for i in $(seq 1 60); do
+            if kubectl get nodes 2>/dev/null | grep -q ' Ready'; then
+              echo "Node is ready"
+              kubectl get nodes
+              break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "Timed out waiting for node"
+              kubectl get nodes -o wide || true
+              vcluster list || true
+              docker ps || true
+              exit 1
+            fi
+            sleep 5
+          done
+      - name: Verify cluster
+        run: |
           kubectl cluster-info
-          echo "=== Pods (all namespaces) ==="
           kubectl get pods -A
       - name: Deploy a workload
         run: |
           kubectl create deployment nginx --image=nginx:alpine
-          kubectl wait --for=condition=available deployment/nginx --timeout=120s
+          kubectl wait --for=condition=available deployment/nginx --timeout=180s
           kubectl get pods
       - name: Verify vcluster list
         run: vcluster list

@@ -14,9 +14,11 @@ jobs:
     steps:
       - uses: loft-sh/setup-vind@main
         with:
+          version: v0.32.0
           name: platform
       - uses: loft-sh/setup-vind@main
         with:
+          version: v0.32.0
           name: agent
       - name: Verify both clusters exist
         run: |

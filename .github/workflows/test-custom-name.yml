@@ -1,0 +1,21 @@
+name: "Test: Custom cluster name"
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  custom-name:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: loft-sh/setup-vind@main
+        with:
+          name: my-custom-cluster
+      - name: Verify cluster name
+        run: |
+          vcluster list | grep my-custom-cluster
+          kubectl get nodes

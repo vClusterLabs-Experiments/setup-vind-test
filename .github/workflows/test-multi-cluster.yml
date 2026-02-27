@@ -1,0 +1,34 @@
+name: "Test: Multi-cluster setup"
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  multi-cluster:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: loft-sh/setup-vind@main
+        with:
+          name: platform
+      - uses: loft-sh/setup-vind@main
+        with:
+          name: agent
+      - name: Verify both clusters exist
+        run: |
+          echo "=== vcluster list ==="
+          vcluster list
+          vcluster list | grep platform
+          vcluster list | grep agent
+      - name: Switch context and verify
+        run: |
+          vcluster connect platform --update-current
+          kubectl get nodes
+          echo "--- platform nodes above ---"
+          vcluster connect agent --update-current
+          kubectl get nodes
+          echo "--- agent nodes above ---"

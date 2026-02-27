@@ -1,0 +1,23 @@
+name: "Test: Config file"
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  config-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: loft-sh/setup-vind@main
+        with:
+          name: configured
+          config: test/vcluster.yaml
+      - name: Verify cluster
+        run: |
+          kubectl get nodes
+          vcluster list

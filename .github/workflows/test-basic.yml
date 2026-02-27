@@ -1,0 +1,30 @@
+name: "Test: Basic cluster"
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  basic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: loft-sh/setup-vind@main
+      - name: Verify cluster is running
+        run: |
+          echo "=== Nodes ==="
+          kubectl get nodes
+          echo "=== Cluster Info ==="
+          kubectl cluster-info
+          echo "=== Pods (all namespaces) ==="
+          kubectl get pods -A
+      - name: Deploy a workload
+        run: |
+          kubectl create deployment nginx --image=nginx:alpine
+          kubectl wait --for=condition=available deployment/nginx --timeout=120s
+          kubectl get pods
+      - name: Verify vcluster list
+        run: vcluster list

@@ -12,7 +12,7 @@ jobs:
   k8s-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: loft-sh/setup-vind@devops-579/fix-k8s-distro-v033
+      - uses: loft-sh/setup-vind@main
         with:
           kubernetes-version: "1.31.0"
       - name: Verify kubernetes version
